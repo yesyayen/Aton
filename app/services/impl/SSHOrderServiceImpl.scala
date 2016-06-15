@@ -176,7 +176,6 @@ class SSHOrderServiceImpl @Inject()(sSHOrderDAO: SSHOrderDAO, sSHOrderToComputer
       case e: Exception => play.Logger.error(s"There was an error checking $computer's state")
         (ComputerState(computer.ip, now, NotConnected().id, None, None), Seq.empty)
     }
-
   }
 
   override def checkState(computer: Computer)(implicit username: String): StateRef = {

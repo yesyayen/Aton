@@ -7,10 +7,22 @@ object SSHFunction {
   val translateOS = Map(
     "Arch" -> "Arch",
     "ManjaroLinux" -> "Arch",
-    "Debian"->"Debian",
+    "Debian" -> "Debian",
     "Ubuntu" -> "Debian",
     "LinuxMint" -> "Debian"
   )
+
+  def checkComputer(os: String) = {
+    val translatedOS = translatedOS(os)
+    s"""
+       |operating_system= $$($operatingSystemCheck)
+       |mac= $$(${macOrders(translatedOS)})
+       |users= $$($userListOrder)
+       |printf "os=%s\n\n" "$$operating_system"
+       |printf "mac=%s\n\n" "$$mac"
+       |printf "users=%s\n\n" "$$users"
+    """.stripMargin
+  }
 
   val dummy = """echo "Ping from Aton""""
 
@@ -33,8 +45,8 @@ object SSHFunction {
   ))
 
   val upgradeOrder = Map(
-    "Arch"->"""sudo pacman -Syu --noconfirm""",
-    "Debian"->"""apt-get update; apt-get upgrade --assume-yes"""
+    "Arch" ->"""sudo pacman -Syu --noconfirm""",
+    "Debian" ->"""apt-get update; apt-get upgrade --assume-yes"""
   )
 
   val operatingSystemCheck = """lsb_release -a 2>/dev/null | grep "Distributor ID" | awk '{print $3}'"""
@@ -48,6 +60,7 @@ object SSHFunction {
   val REBOOT_ORDER = "shutdown -r now"
   val IP_OBTAINING_ORDER = "ifconfig eth0 2>/dev/null|awk '/Direc. inet:/ {print $2}'|sed 's/inet://'"
   val userListOrder = "who | cut -d' ' -f1 | sort | uniq"
+
   def blockPageOrder(page: String) = s"""cp /etc/hosts /etc/hosts.bak && echo "127.0.0.1 $page" >> /etc/hosts && echo "Added page" """
 
   def COMPUTER_WAKEUP_ORDER(sufijoIPSala: Int, mac: String) = "wakeonlan -i 192.168." + sufijoIPSala + ".255 " + mac
